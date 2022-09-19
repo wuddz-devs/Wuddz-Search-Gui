@@ -50,7 +50,7 @@
 - It's Just An Awesome Way Of Doing Everyday OS Platform Tasks In A Much Quicker & Efficient Manner.
 
 
-##Contact Info:
+## Contact Info:
 - Email:     wuddz_devs@protonmail.com
 - Github:    https://github.com/wuddz-devs
 - Reddit:    https://reddit.com/user/wuddz-devs
@@ -58,7 +58,7 @@
 - Youtube:   wuddz-devs
 
 
-###Video:
+### Video:
 - https://youtu.be/APFVlh5rRHk
 
 
