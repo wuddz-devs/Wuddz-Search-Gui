@@ -59,7 +59,6 @@
 
 
 ### Video:
-- https://youtu.be/APFVlh5rRHk
 - https://youtu.be/GTvM5_gxhsk (Edited No Restrictions)
 
 
