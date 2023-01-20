@@ -1,67 +1,67 @@
-# Wuddz-Search-Gui *ALL IN 1, File/Folder Searcher, Parser & Archiver (Encryption Optional) GUI Application.
-
+<h1 align="center">Wuddz Search Gui</h1>
+<p align="center">A Python File/Folder Explorer GUI Application, Search, Open, Save, Copy, Move, Rename, Delete, Parse & Archive (Encryption Optional).</p>
+<p align="center">
+    <img src="https://raw.githubusercontent.com/wuddz-devs/Wuddz-Search-Gui/main/screenshots/wsg.png" alt="Empty interface">
+</p>
 
 ## Description
-- Wuddz-Search-Gui Is An Update Of My Repository Wuddz-Search, As A More User Friendly & Eye Pleasing GUI Application.
-
-- File/Folder Search/Copy/Move/Delete, Regex Pattern Parser, File/Folder Archiver With Or Without Encryption. 
-
-- Search A Specific Folder/Entire OS Platform Root Folder For Files Containing Specified String And/Or File Extension.
+ - Wuddz-Search-Gui Is An Update Of My Wuddz-Search Repository, As A More User Friendly & Eye Pleasing GUI Application.
  
-- Parse Searched Files For A Preconfigured Regex Pattern Or Enter Specific Regex Pattern.
+ - Search A Specific Folder/Entire OS Platform Root Folder For Files Containing Specified String And/Or File Extension.
   
-- Execute Common OS Platform Explorer Tasks e.g Copy, Move, Delete Files Or Folders.
-  
-- Archive File(s) Or Folder(s) With Or Without Encryption, Using The Free & Open Source 7zip Software.
+ - Parse Searched Files For A Preconfigured Regex Pattern Or Enter Specific Regex Pattern.
+   
+ - Archive File(s) Or Folder(s) With Or Without Encryption, Using The Free & Open Source 7zip Software.
+ 
+ - Save Searched File List As Text In Specified Output Text File.
+ 
+ - Open Any File/Program On Your OS System With Adequate Permissions.
 
-- Save Searched File List As Text In Specified Output Text File.
+## Prerequisites
+ - Install Free Open Source 7zip Application [7zip](https://www.7-zip.org/download.html)
+ 
+ - Add 7zip To Os Path i.e if you type '7z' anywhere in terminal/cmd/powershell it will launch 7zip Application
+ 
+ - Python : 3.6
 
-- For Those That Prefer GUI (i.e Graphical User Interface) to CLI (i.e Command Line Interface)
+## Installation
+Install using [PyPI](https://pypi.org/project/wuddz-search-gui):
+```
+$ pip install wuddz-search-gui
+```
+Install locally by cloning or downloading and extracting the repo, then cd into 'dist' directory and execute:
+```
+$ pip install wuddz_search_gui-1.0.1.tar.gz
+```
+Then to run it, execute the following in the terminal:
+```
+$ wudz-sgui
+```
 
-- Open Any File/Program On Your OS System
-
-
-## Requirements
-- PyQt5==5.15.7
-- Install 7zip
-
-
-## Setup Wuddz-Search-Gui
-- Install python  [Link: https://www.python.org/downloads/]
-
-- Install 7zip  [Link: https://www.7-zip.org/download.html]
-
-- Add Installed 7zip Executable Folder To System Path On Windows OS
-
-- Open "cmd" | "powershell" | "terminal" depending on your OS platform, navigate to repository root folder containing 'requirements.txt'
-
-- Type "pip install -r requirements.txt" To Install Required Python Dependencies
-
-- When Complete Type "python wuddz_search_gui.py" To Enjoy This Updated ALL IN 1 EXPLORER, PARSER & ARCHIVER GUI Application.
-
-- If You're Using Windows OS & Prefer Not To Install Python, Simply Download Latest Release, Extract & Run 'wudz-sgui.exe'
-
-- You Can Create A Shortcut For 'wudz-sgui.exe' & Paste Anywhere To Launch Wuddz-Search-Gui With 1 Click.
-
-- If You Prefer A Quicker, More Condensed Way To Search, Archive & Parse Files On Your OS, Then Look No Further.
-
-- Execute OS Platform Tasks With Consumate Ease & Efficiency.
-
-- It's Just An Awesome Way Of Doing Everyday OS Platform Tasks In A Much Quicker & Efficient Manner.
-
+## Usage
+ - Once Launched Follow Tooltips Provided.
+ 
+ - If You're Using Windows OS & Prefer Not To Install Python, Simply Download Latest Release, Extract & Run 'wudz-sgui.exe'
+ 
+ - You Can Create A Shortcut For 'wudz-sgui.exe' & Paste Anywhere To Launch Wuddz-Search-Gui With 1 Click.
+ 
+ - If You Prefer A Quicker, More Condensed Way To Search, Archive & Parse Files On Your OS, Then Look No Further.
+ 
+ - Execute OS Platform Tasks With Consumate Ease & Efficiency, Using This Cool Python Coded Application.
+ 
+ - It's Just An Awesome Way Of Doing Everyday OS Platform Tasks In A Much Quicker & Efficient Manner.
 
 ## Contact Info:
-- Email:     wuddz_devs@protonmail.com
-- Github:    https://github.com/wuddz-devs
-- Reddit:    https://reddit.com/user/wuddz-devs
-- Telegram:  https://t.me/wuddz_devs
-- Youtube:   wuddz-devs
-
+ - Email:     wuddz_devs@protonmail.com
+ - Github:    https://github.com/wuddz-devs
+ - Reddit:    https://reddit.com/user/wuddz-devs
+ - Telegram:  https://t.me/wuddz_devs
+ - Youtube:   https://youtube.com/@wuddz-devs
 
 ### Video:
-- https://youtu.be/GTvM5_gxhsk (Edited No Restrictions)
-
+ - https://youtu.be/GTvM5_gxhsk (Edited No Restrictions)
 
 ### If You're Feeling Generous & Appreciative, Buy Me A Coffee
-- Ethereum: 0x1F1C47dD653Af628D394eac7bAA9Ccf774fd784f
-- Peace & Love Always!!
+ - ERC20: 0x1F1C47dD653Af628D394eac7bAA9Ccf774fd784f
+
+### Peace & Love Always!!

@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["wuddz_search_gui"]
+
+[project]
+name = "wuddz-search-gui"
+version = "1.0.1"
+description = "Python File/Folder Explorer GUI Application, Search, Open, Save, Copy, Move, Rename, Delete, Parse & Archive (Encryption Optional)"
+readme = "README.md"
+authors = [
+  { name="Wuddz-Devs", email="wuddz_devs@protonmail.com" },
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.7"
+keywords = ["search", "explorer", "gui", "copy", "move", "parse", "archive", "file", "folder"]
+classifiers = [
+		'License :: OSI Approved :: MIT License',
+		'Programming Language :: Python',
+		'Programming Language :: Python :: 3.7',
+		'Programming Language :: Python :: 3.8',
+		'Programming Language :: Python :: 3.9',
+		'Programming Language :: Python :: 3.10',
+]
+dependencies = ["pyqt5>=5.15.7"]
+
+[project.scripts]
+wudz-sgui = "wuddz_search_gui.search_gui:gui_main"
+
+[project.urls]
+"Homepage" = "https://github.com/wuddz-devs/Wuddz-Search-Gui"
+"Download" = "https://github.com/wuddz-devs/Wuddz-Search-Gui/releases/download/v1.0.1/wuddz-search-gui-1.0.1.zip"
