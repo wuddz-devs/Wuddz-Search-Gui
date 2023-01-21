@@ -22,7 +22,7 @@
  
  - Add 7zip To Os Path i.e if you type '7z' anywhere in terminal/cmd/powershell it will launch 7zip Application
  
- - Python : 3.6
+ - Python : 3.7
 
 ## Installation
 Install using [PyPI](https://pypi.org/project/wuddz-search-gui):
@@ -31,7 +31,7 @@ $ pip install wuddz-search-gui
 ```
 Install locally by cloning or downloading and extracting the repo, then cd into 'dist' directory and execute:
 ```
-$ pip install wuddz_search_gui-1.0.1.tar.gz
+$ pip install wuddz_search_gui-1.0.2.tar.gz
 ```
 Then to run it, execute the following in the terminal:
 ```
@@ -50,6 +50,8 @@ $ wudz-sgui
  - Execute OS Platform Tasks With Consumate Ease & Efficiency, Using This Cool Python Coded Application.
  
  - It's Just An Awesome Way Of Doing Everyday OS Platform Tasks In A Much Quicker & Efficient Manner.
+
+ - To Close Opened Windows Simply Hit "Esc" Or "Ctrl+Q" To Close The Program.
 
 ## Contact Info:
  - Email:     wuddz_devs@protonmail.com

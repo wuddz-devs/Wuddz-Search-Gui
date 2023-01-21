@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from pathlib import Path, PurePath
 from subprocess import run, Popen, DEVNULL
 from os import rename, path, kill, getpid
+from shlex import quote
 
 
 class WorkerSignals(QtCore.QObject):
@@ -29,7 +30,6 @@ class Search_Gui(QtWidgets.QMainWindow):
             exec(f'self.{i}=""')
         self.free=True
         self.name=platform.system()
-        self.kp={'Windows':'taskkill /F /IM 7z.exe','Linux':'killall -9 7z','Darwin':'killall 7z'}
         self.sf=["","*","*.py","*.txt","*.jpg","*.jpeg","*.png","*.gif","*.mp4","*.mkv","*.wmv","*.mp3","*.exe"]
         self.ico=str((Path(__file__).absolute().parent).joinpath('wudz-sgui.ico'))
         self.pkg=str(Path.home().expanduser().joinpath('Downloads','SEARCH'))
@@ -43,12 +43,13 @@ class Search_Gui(QtWidgets.QMainWindow):
         drv.append(self.pkg)
         if self.name=='Windows':
             self.drv.extend([f'{x}:\\' for x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' if path.exists(f'{x}:')])
+            self.drv.extend(sorted(drv)+[str(x) for x in Path(Path(sys.executable).anchor).iterdir() if Path(x).is_dir()])
         else:
             drv.insert(0,'/')
             out=run(['df'], capture_output=True, text=True)
             drvv=re.findall('(/media/\w+/\w+)',str(out))
             if drvv:drv.extend(drvv)
-        self.drv.extend(sorted(drv))
+            self.drv.extend(sorted(drv))
         self.la=[
             "Search Formats:    [.ext=File Extension]",
             "*              All Files In Directory",
@@ -83,7 +84,7 @@ class Search_Gui(QtWidgets.QMainWindow):
         self.searchformat=self.set_params(widget='QComboBox',obj=self.centralwidget,
 mi=13,name='searchformat',tt="Input OR Select Search Format",items=self.sf)
         self.directoryinput=self.set_params(widget='QComboBox',obj=self.centralwidget,
-mi=15,name='directoryinput',tt="Input OR Select Search Directory",items=self.drv)
+mi=20,name='directoryinput',tt="Input OR Select Search Directory",items=self.drv)
         self.searchformat.installEventFilter(self)
         self.directoryinput.installEventFilter(self)
         self.searchbtn=self.lbtn_widget(widget="QPushButton",obj=self.centralwidget,name="searchbtn",text="Search")
@@ -95,8 +96,8 @@ mi=15,name='directoryinput',tt="Input OR Select Search Directory",items=self.drv
         self.setCentralWidget(self.centralwidget)
         self.threadpool=QtCore.QThreadPool.globalInstance()
         self.searchbtn.clicked.connect(self.search_main)
-        self.listarea.itemDoubleClicked.connect(lambda: self.open_file(self.listarea.currentItem()))
-        self.listarea.itemSelectionChanged.connect(lambda: self.list_selection())
+        self.listarea.itemDoubleClicked.connect(lambda: self.open_file('fto'))
+        self.listarea.itemSelectionChanged.connect(self.list_selection)
         self.actionOpen.triggered.connect(lambda: self.menu_main('Open'))
         self.actionSave.triggered.connect(lambda: self.menu_main('Save'))
         self.actionQuit.triggered.connect(lambda: self.closeEvent(QtGui.QCloseEvent))
@@ -384,29 +385,35 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
     def thread_result(self,lst):
         self.ctask=''
         self.free=True
-        if type(lst)==tuple:
-            if type(lst[0])==str:
-                self.statusbar_msg(lst[0])
-                if lst[1]:
-                    if self.rows:[self.listarea.takeItem(self.listarea.row(s)) for s in self.rows]
-                    else:self.listarea.clear()
-            else:self.list_add(lst[0],lst[1])
+        if type(lst)==tuple:self.list_add(lst[0],lst[1])
         else:self.statusbar_msg(lst)
+    
+    def del_items(self):
+        for r in self.rows:
+            self.fst.pop(r)
+            self.flst.pop(r)
+        if self.flst:[self.listarea.takeItem(self.listarea.row(s)) for s in self.listarea.selectedItems()]
+        else:self.listarea.clear()
     
     def list_add(self,fst,flst):
         self.fst=fst
         self.flst=flst
-        if flst:self.listarea.addItems(fst)
+        if flst:
+            self.listarea.addItems(fst[:-1])
+            l=QtWidgets.QListWidgetItem(fst[-1])
+            l.setFlags(QtCore.Qt.NoItemFlags)
+            self.listarea.addItem(l)
         self.statusBar.showMessage(f"Total Items: {len(flst)}")
     
     def list_selection(self):
         try:
-            self.sfst=''
-            self.slist=''
-            self.rows=self.listarea.selectedItems()
-            rows=[str(x) for x in (str(self.listarea.selectedItems()[i].text()) for i in range(len(self.rows)))]
-            self.slist=[re.search(r'(\/.*\.[\w:]+\S)',str(r)).group(1) for r in rows]
-            self.sfst=[re.search('\d+  ((\/.*\.[\w:]+)(.*))',str(r)).group(1) for r in rows]
+            self.sfst=[]
+            self.slist=[]
+            self.rows=[]
+            for x in self.listarea.selectedIndexes():
+                self.rows.append(x.row())
+                self.slist.append(self.flst[x.row()])
+                self.sfst.append(self.fst[x.row()])
         except:pass
     
     def file_size(self,val):
@@ -427,12 +434,12 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
         tot=0
         for fn in Path(di).rglob(sf):
             if Path(fn).exists():
-                flst.append(fn)
+                flst.append(str(fn))
                 cnt+=1
                 tl,ls=self.enum_sub(fn,cnt)
                 tot+=tl
                 lst.append(ls)
-        lst.append('Total File Size►► '+str(self.file_size(tot)))
+        lst.append('Total File Size: '+str(self.file_size(tot)))
         return lst,flst
     
     def enum_sub(self,fn,cnt):
@@ -464,9 +471,10 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
             fto=self.obj_cmbox.currentText()
         if Path(fto).is_file():
             if self.name=='Windows':
-                if Path(fto).suffix=='.exe':Popen(['start',str(fto)],shell=True)
-                else:Popen([str(fto)],shell=True)
-            else:Popen(['open '+str(fto)],shell=True)
+                if Path(fto).name=='cmd.exe' or Path(fto).name=='powershell.exe':
+                    Popen('start '+str(fto),shell=True)
+                else:Popen('"{}"'.format(str(fto)),shell=True)
+            else:Popen('open "{}"'.format(str(fto)),shell=True)
             self.statusbar_msg("Opened '{}' Successfully".format(fto))
         else:self.statusbar_msg()
     
@@ -488,7 +496,12 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
             except:pass
             if Path(nf).exists():
                 self.statusbar_msg(f'"{Path(sf).name}" Renamed To "{Path(nf).name}" Successfully')
-                if sls:self.rows[0].setText(self.enum_sub(nf,self.listarea.currentRow()+1)[1])
+                if sls:
+                    upd=self.enum_sub(nf,self.listarea.currentRow()+1)[1]
+                    self.listarea.item(self.rows[0]).setText(upd)
+                    self.fst[self.rows[0]]=upd
+                    self.flst[self.rows[0]]=str(nf)
+                    self.list_selection()
                 return True
     
     def file_list(self,lst,slst):
@@ -541,9 +554,10 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
                 dlst=self.file_list(self.flst,self.slist)
                 self.list_modes(['Path(fp).unlink()','shutil.rmtree(fp)'],dlst)
                 df=(str(df).replace('<','')).replace('>','')
+                self.del_items()
             elif Path(df).is_file():Path(df).unlink()
             else:shutil.rmtree(df,ignore_errors=False,onerror=None)
-            return "Deleted '{}' Successfully".format(df), dlst
+            return "Deleted '{}' Successfully".format(df)
         except:pass
     
     def regex_search(self):
@@ -577,6 +591,7 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
                                 [plst.append(a) for b in (x for x in f) for a in re.compile(str(rp)).findall(b)]
                 if plst and self.write_file(opf,sorted(set(plst))):
                     return f'{len(plst)} Matches Saved ►► {opf}'
+                return 'No Matches Found'
         except:pass
     
     def archive_list(self,menu):
