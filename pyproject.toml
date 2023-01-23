@@ -7,7 +7,7 @@ only-include = ["wuddz_search_gui"]
 
 [project]
 name = "wuddz-search-gui"
-version = "1.0.2"
+version = "1.0.3"
 description = "Python File/Folder Explorer GUI Application, Search, Open, Save, Copy, Move, Rename, Delete, Parse & Archive (Encryption Optional)"
 readme = "README.md"
 authors = [
@@ -31,4 +31,4 @@ wudz-sgui = "wuddz_search_gui.search_gui:gui_main"
 
 [project.urls]
 "Homepage" = "https://github.com/wuddz-devs/Wuddz-Search-Gui"
-"Download" = "https://github.com/wuddz-devs/Wuddz-Search-Gui/releases/download/v1.0.1/wuddz-search-gui-1.0.2.zip"
+"Download" = "https://github.com/wuddz-devs/Wuddz-Search-Gui/releases/download/v1.0.3/wuddz-search-gui-1.0.3.zip"

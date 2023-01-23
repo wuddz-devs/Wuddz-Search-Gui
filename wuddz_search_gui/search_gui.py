@@ -1,9 +1,8 @@
 import secrets, string, sys, re, time, shutil, signal, platform
 from PyQt5 import QtCore, QtGui, QtWidgets
-from pathlib import Path, PurePath
-from subprocess import run, Popen, DEVNULL
-from os import rename, path, kill, getpid
-from shlex import quote
+from pathlib import Path
+from subprocess import run, Popen, PIPE
+from os import rename, path, kill, getpid, walk
 
 
 class WorkerSignals(QtCore.QObject):
@@ -361,7 +360,7 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
         self.wgt.move(fg.topLeft())
         self.wgt.show()
         self.cw=QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self.wgt)
-        self.cw.activated.connect(lambda: self.wgt.close())
+        self.cw.activated.connect(self.wgt.close)
     
     def thread_run(self,**var):
         if self.free:
@@ -398,8 +397,7 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
     def list_add(self,fst,flst):
         self.fst=fst
         self.flst=flst
-        if flst:
-            self.listarea.addItems(fst[:-1])
+        if fst:
             l=QtWidgets.QListWidgetItem(fst[-1])
             l.setFlags(QtCore.Qt.NoItemFlags)
             self.listarea.addItem(l)
@@ -432,14 +430,16 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
         lst=[]
         cnt=0
         tot=0
-        for fn in Path(di).rglob(sf):
-            if Path(fn).exists():
-                flst.append(str(fn))
+        for p,d,f in walk(di):
+            fd=Path(p).glob(sf)
+            for i in fd:
                 cnt+=1
-                tl,ls=self.enum_sub(fn,cnt)
+                flst.append(str(i))
+                tl,ls=self.enum_sub(i,cnt)
                 tot+=tl
                 lst.append(ls)
-        lst.append('Total File Size: '+str(self.file_size(tot)))
+        self.listarea.addItems(lst)
+        lst.append('Total File Size: {}'.format(str(self.file_size(tot))))
         return lst,flst
     
     def enum_sub(self,fn,cnt):
@@ -599,21 +599,20 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
             st=[]
             pkk=''
             try:
-                ap=self.obj_cmbox.currentText()
-                if str(Path(ap).suffix) in '.7z,.zip,.tar' and not Path(ap).exists():
-                    ap=self.out_dir(ap)
+                ap=self.out_dir(self.obj_cmbox.currentText())
+                if Path(ap).suffix in '.7z,.zip,.tar' and not Path(ap).exists():
                     alst=self.file_list(self.flst,self.slist)
                     dup,ndp=self.archive_sub(alst)
-                    if menu=='Archive_E' and str(Path(ap).suffix)!='.tar':
+                    if menu=='Archive_E' and Path(ap).suffix!='.tar':
                         pkk=self.obj_lineEdit.text()
                         if not pkk:pkk=''.join(secrets.choice((string.ascii_letters+string.digits).strip()) for i in range(32))
-                        sub=['7z', 'a', '-t'+str(Path(ap).suffix)[1:], str(ap), '@'+str(self.lf), '-mx9', '-mhe', '-p'+pkk]
-                        if str(Path(ap).suffix)=='.zip':sub=str(sub).replace(" '-mhe',",'')
-                        pwf=str(Path(ap).stem)
-                        with open(str(self.af).replace('archive',pwf), 'w', encoding='utf-8') as ps:
-                            ps.write("'"+str(Path(ap).resolve())+"'\n"+str(pkk)+'\n'+'_'*146+'\n\n')
+                        sub=['7z', 'a', '-t'+Path(ap).suffix[1:], str(ap), '@'+str(self.lf), '-mx9', '-p'+pkk, '-mhe']
+                        if Path(ap).suffix=='.zip':sub.remove('-mhe')
+                        pwf=str(self.af).replace('archive',Path(ap).stem)
+                        with open(pwf, 'w', encoding='utf-8') as ps:
+                            ps.write("'"+str(ap)+"'\n"+str(pkk)+'\n'+'_'*146+'\n\n')
                     elif menu=='Archive_No_E':
-                        sub=['7z', 'a', '-t'+str(Path(ap).suffix)[1:], str(ap), '@'+str(self.lf), '-mx9']
+                        sub=['7z', 'a', '-t'+Path(ap).suffix[1:], str(ap), '@'+str(self.lf), '-mx9']
                     if ndp:st.append(self.list_archive(ap,ndp,sub,pkk=pkk))
                     if dup:st.append(self.list_archive(ap,dup,sub,pkk=pkk,dpl='yes'))
             except:pass
@@ -624,11 +623,12 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
     def archive_sub(self,lst):
         dup=[]
         ndup=[]
+        fn=[Path(a).name for a in lst if Path(a).is_file()]
         for file in lst:
-            if Path(file).is_file():
-                if str(lst).count(str(PurePath(file).name))>1:dup.append(file)
-                else:ndup.append(file)
-        return dup, ndup
+            a=Path(file).name
+            if fn.count(a)>1:dup.append(file)
+            elif a in fn:ndup.append(file)
+        return dup,ndup
     
     def list_modes(self,lst,elst,des=None):
         for fp in elst:
@@ -637,7 +637,7 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
                 fn=Path(fp).name
                 while Path(des).joinpath(fn).exists():
                     dc+=1
-                    fn=str(Path(fp).stem)+f'_{dc}'+str(Path(fp).suffix)
+                    fn=Path(fp).stem+f'_{dc}'+Path(fp).suffix
                 dec=str(Path(des).joinpath(fn))
             for l in lst:
                 try:
@@ -648,10 +648,10 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
         try:
             lst=str(self.lf)
             self.write_file(lst,list)
-            if dpl!=None:sub=str(sub).replace(" epath,", " epath, '-spf',")
+            if dpl:sub.append('-spf')
             self.out=Popen(sub,shell=False,stdout=PIPE,stderr=PIPE,universal_newlines=True)
-            if 'Everything is Ok' in str(self.out.communicate()[0]) and dpl==None:
-                return "Files Archived Successfully ►► {}".format(str(Path(epath).resolve()))
+            if 'Everything is Ok' in str(self.out.communicate()[0]):
+                return "Files Archived Successfully ►► {}".format(str(epath))
         except:pass
 
 def gui_main():
