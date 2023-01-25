@@ -31,7 +31,7 @@ $ pip install wuddz-search-gui
 ```
 Install locally by cloning or downloading and extracting the repo, then cd into 'dist' directory and execute:
 ```
-$ pip install wuddz_search_gui-1.0.3.tar.gz
+$ pip install wuddz_search_gui-1.0.4.tar.gz
 ```
 Then to run it, execute the following in the terminal:
 ```

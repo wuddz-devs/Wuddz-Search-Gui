@@ -26,7 +26,7 @@ class Search_Gui(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.drv=['']
         for i in ['sfst','slist','flst','fst','rows','ctask']:
-            exec(f'self.{i}=""')
+            exec(f'self.{i}=[]')
         self.free=True
         self.name=platform.system()
         self.sf=["","*","*.py","*.txt","*.jpg","*.jpeg","*.png","*.gif","*.mp4","*.mkv","*.wmv","*.mp3","*.exe"]
@@ -99,6 +99,7 @@ mi=20,name='directoryinput',tt="Input OR Select Search Directory",items=self.drv
         self.listarea.itemSelectionChanged.connect(self.list_selection)
         self.actionOpen.triggered.connect(lambda: self.menu_main('Open'))
         self.actionSave.triggered.connect(lambda: self.menu_main('Save'))
+        self.actionFullscreen.triggered.connect(self.ui_size)
         self.actionQuit.triggered.connect(lambda: self.closeEvent(QtGui.QCloseEvent))
         self.actionCopy.triggered.connect(lambda: self.menu_main('Copy'))
         self.actionMove.triggered.connect(lambda: self.menu_main('Move'))
@@ -110,6 +111,10 @@ mi=20,name='directoryinput',tt="Input OR Select Search Directory",items=self.drv
         self.actionEncryption.triggered.connect(lambda: self.menu_main('Archive_E'))
         QtCore.QMetaObject.connectSlotsByName(self)
     
+    def ui_size(self):
+        if self.isMaximized():self.showNormal()
+        else:self.showMaximized()
+    
     def ui_layout(self):
         ld={'window':'QtWidgets.QVBoxLayout','text':'QtWidgets.QVBoxLayout',
             'dir':'QtWidgets.QGridLayout','list':'QtWidgets.QVBoxLayout'}
@@ -119,7 +124,7 @@ mi=20,name='directoryinput',tt="Input OR Select Search Directory",items=self.drv
             exec(f'self.{k}Layout.setSpacing(1)')
     
     def ui_menu(self):
-        ad={'File':['Open__Ctrl+O','Save__Ctrl+S','Quit__Ctrl+Q'],
+        ad={'File':['Open__Ctrl+O','Save__Ctrl+S','Fullscreen__Ctrl+F','Quit__Ctrl+Q'],
             'Edit':['Copy__Alt+C','Move__Alt+M','Delete__Alt+Del','Rename__Alt+R','Parse__Alt+P'],
             'Archive':['Encryption__Alt+E','No Encryption__Alt+N'],
             'Help':['About__Alt+H']}
@@ -194,44 +199,8 @@ mi=20,name='directoryinput',tt="Input OR Select Search Directory",items=self.drv
         lwd.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         lwd.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         lwd.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        lwd.setResizeMode(QtWidgets.QListView.Adjust)
+        lwd.setResizeMode(QtWidgets.QListView.Fixed)
         return lwd
-    
-    def closeEvent(self,event):
-        try:
-            self.out.terminate()
-        except:pass
-        kill(getpid(), signal.SIGTERM)
-    
-    def eventFilter(self,source,event):
-        if source is self.listarea and self.listarea:
-            if event.type()==QtCore.QEvent.ContextMenu:
-                menu=QtWidgets.QMenu()
-                sv=menu.addAction('Save')
-                cp=menu.addAction('Copy')
-                mv=menu.addAction('Move')
-                dl=menu.addAction('Delete')
-                rn=menu.addAction('Rename')
-                pr=menu.addAction('Parse')
-                en=menu.addAction('Encryption')
-                ne=menu.addAction('No Encryption')
-                trig=menu.exec_(event.globalPos())
-                item=source.itemAt(event.pos())
-                if trig==sv:self.menu_main('Save')
-                elif trig==cp:self.menu_main('Copy')
-                elif trig==mv:self.menu_main('Move')
-                elif trig==dl:self.menu_main('Delete')
-                elif trig==rn:self.menu_main('Rename')
-                elif trig==pr:self.menu_main('Parse')
-                elif trig==en:self.menu_main('Archive_E')
-                elif trig==ne:self.menu_main('Archive_No_E')
-                return True
-            elif event.type()==QtCore.QEvent.KeyPress and event.matches(QtGui.QKeySequence.InsertParagraphSeparator):
-                self.open_file('d')
-        elif source is self.searchformat or source is self.directoryinput:
-            if event.type()==QtCore.QEvent.KeyPress and event.matches(QtGui.QKeySequence.InsertParagraphSeparator):
-                self.search_main()
-        return super().eventFilter(source,event)
     
     def menu_main(self,menu):
         obj_btn=''
@@ -361,6 +330,42 @@ items=["","<All OR Selected List Items>"]+self.drv[1:],tt="File/Folder To Be\nCo
         self.wgt.show()
         self.cw=QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self.wgt)
         self.cw.activated.connect(self.wgt.close)
+    
+    def closeEvent(self,event):
+        try:
+            self.out.terminate()
+        except:pass
+        kill(getpid(), signal.SIGTERM)
+    
+    def eventFilter(self,source,event):
+        if source is self.listarea and self.listarea:
+            if event.type()==QtCore.QEvent.ContextMenu:
+                menu=QtWidgets.QMenu()
+                sv=menu.addAction('Save')
+                cp=menu.addAction('Copy')
+                mv=menu.addAction('Move')
+                dl=menu.addAction('Delete')
+                rn=menu.addAction('Rename')
+                pr=menu.addAction('Parse')
+                en=menu.addAction('Encryption')
+                ne=menu.addAction('No Encryption')
+                trig=menu.exec_(event.globalPos())
+                item=source.itemAt(event.pos())
+                if trig==sv:self.menu_main('Save')
+                elif trig==cp:self.menu_main('Copy')
+                elif trig==mv:self.menu_main('Move')
+                elif trig==dl:self.menu_main('Delete')
+                elif trig==rn:self.menu_main('Rename')
+                elif trig==pr:self.menu_main('Parse')
+                elif trig==en:self.menu_main('Archive_E')
+                elif trig==ne:self.menu_main('Archive_No_E')
+                return True
+            elif event.type()==QtCore.QEvent.KeyPress and event.matches(QtGui.QKeySequence.InsertParagraphSeparator):
+                self.open_file('d')
+        elif source is self.searchformat or source is self.directoryinput:
+            if event.type()==QtCore.QEvent.KeyPress and event.matches(QtGui.QKeySequence.InsertParagraphSeparator):
+                self.search_main()
+        return super().eventFilter(source,event)
     
     def thread_run(self,**var):
         if self.free:
